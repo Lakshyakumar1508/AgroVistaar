@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crop Disease Detector</title>
+    <style>
+        /* General Body Styling */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f2f5;
+            color: #333;
+        }
+
+        /* Main Container */
+        .container {
+            background-color: #ffffff;
+            padding: 2rem 3rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 100%;
+            max-width: 500px;
+            transition: transform 0.3s ease;
+        }
+
+        .container:hover {
+            transform: translateY(-5px);
+        }
+
+        /* Header */
+        h1 {
+            color: #1a73e8;
+            margin-bottom: 0.5rem;
+        }
+
+        p {
+            color: #5f6368;
+            margin-bottom: 2rem;
+        }
+
+        /* Image Preview Area */
+        #imagePreview {
+            width: 100%;
+            height: 250px;
+            border: 2px dashed #dadce0;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #fafafa;
+            overflow: hidden;
+            position: relative;
+        }
+
+        #imagePreview img {
+            max-width: 100%;
+            max-height: 100%;
+            display: none; /* Hidden by default */
+        }
+        
+        #previewText {
+            color: #888;
+        }
+
+        /* File Input Styling */
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            cursor: pointer;
+            padding: 12px 25px;
+            background-color: #1a73e8;
+            color: white;
+            border-radius: 5px;
+            font-weight: 500;
+            margin-bottom: 1.5rem;
+            transition: background-color 0.3s;
+        }
+        
+        .file-input-wrapper:hover {
+            background-color: #155ab6;
+        }
+
+        #imageUpload {
+            position: absolute;
+            font-size: 100px;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        /* Prediction Result Area */
+        #predictionResult {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            border-radius: 8px;
+            background-color: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            min-height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+        
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #1a73e8;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+            display: none; /* Hidden by default */
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .result-text {
+            color: #202124;
+        }
+        
+        .error-text {
+            color: #d93025;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Crop Disease Detector</h1>
+        <p>Upload an image of a plant leaf to classify its health.</p>
+
+        <!-- Image Upload Form -->
+        <form id="uploadForm" enctype="multipart/form-data">
+            <!-- Image Preview -->
+            <div id="imagePreview">
+                <img id="previewImg" src="#" alt="Image Preview"/>
+                <span id="previewText">Image Preview</span>
+            </div>
+
+            <!-- Custom File Upload Button -->
+            <div class="file-input-wrapper">
+                <span>Select Image</span>
+                <input type="file" name="file" id="imageUpload" accept="image/*" required>
+            </div>
+        </form>
+
+        <!-- Prediction Result Display -->
+        <div id="predictionResult">
+            <div class="loader" id="loader"></div>
+            <span class="result-text" id="resultText">Prediction will appear here.</span>
+        </div>
+    </div>
+
+    <script>
+        const imageUpload = document.getElementById('imageUpload');
+        const imagePreview = document.getElementById('imagePreview');
+        const previewImg = document.getElementById('previewImg');
+        const previewText = document.getElementById('previewText');
+        const predictionResult = document.getElementById('predictionResult');
+        const resultText = document.getElementById('resultText');
+        const loader = document.getElementById('loader');
+
+        // Function to preview the image
+        imageUpload.addEventListener('change', function() {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                
+                previewText.style.display = 'none';
+                previewImg.style.display = 'block';
+
+                reader.addEventListener('load', function() {
+                    previewImg.setAttribute('src', this.result);
+                });
+                
+                reader.readAsDataURL(file);
+
+                // Automatically submit the form once a file is chosen
+                submitForm();
+            }
+        });
+
+        // Function to handle form submission via Fetch API
+        async function submitForm() {
+            const file = imageUpload.files[0];
+            if (!file) {
+                return;
+            }
+
+            // Show loader and clear previous result
+            loader.style.display = 'block';
+            resultText.textContent = '';
+            resultText.classList.remove('error-text');
+            
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                // Send the image to the Flask API endpoint using the full URL
+                const response = await fetch('http://127.0.0.1:5000/predict', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                // Display the prediction result
+                if (data.error) {
+                    resultText.textContent = `Error: ${data.error}`;
+                    resultText.classList.add('error-text');
+                } else {
+                    // Clean up class name for better readability
+                    const className = data.predicted_class.replace(/_/g, ' ');
+                    resultText.textContent = `Prediction: ${className} (Confidence: ${data.confidence})`;
+                }
+
+            } catch (error) {
+                console.error('Error:', error);
+                resultText.textContent = 'Failed to get prediction. Is the server running?';
+                resultText.classList.add('error-text');
+            } finally {
+                // Hide loader
+                loader.style.display = 'none';
+            }
+        }
+    </script>
+
+</body>
+</html>
+
