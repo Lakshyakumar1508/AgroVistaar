@@ -1,0 +1,186 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Profile - AgroVistaar</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f6f8;
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+        /* ----- Navbar ----- */
+        nav {
+            background-color: #4caf50;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 30px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        nav .logo {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 20px;
+            margin: 0;
+            padding: 0;
+        }
+
+        nav ul li a {
+            color: white;
+            font-weight: 500;
+            transition: 0.3s;
+        }
+
+        nav ul li a:hover {
+            color: #ffeb3b;
+        }
+
+        /* ----- Container ----- */
+        .container {
+            max-width: 1000px;
+            margin: 30px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        /* ----- Profile Header ----- */
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .profile-header img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #4caf50;
+        }
+
+        .profile-header div h2 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .profile-header div p {
+            margin: 5px 0 0;
+            color: #555;
+        }
+
+        .logout-btn {
+            background: #f44336;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-weight: bold;
+            margin-left: auto;
+        }
+
+        /* ----- Dashboard Cards ----- */
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: #e8f5e9;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+
+        .card:hover {
+            background: #c8e6c9;
+        }
+
+        .card h3 {
+            margin: 0 0 10px;
+            color: #388e3c;
+        }
+
+        /* ----- Footer ----- */
+        footer {
+            background-color: #4caf50;
+            color: white;
+            padding: 20px 30px;
+            text-align: center;
+            margin-top: 50px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navbar -->
+    <nav>
+        <div class="logo">AgroVistaar</div>
+        <ul>
+            <li><a href="{% url 'home' %}">Home</a></li>
+            <li><a href="{% url 'services' %}">Services</a></li>
+            <li><a href="{% url 'profile' %}">Profile</a></li>
+        </ul>
+    </nav>
+
+    <!-- Profile Container -->
+    <div class="container">
+        <div class="profile-header">
+            <img src="{% static 'services/user-avatar.png' %}" alt="User Avatar">
+            <div>
+                <h2>{{ user.username }}</h2>
+                <p>{{ user.email }}</p>
+            </div>
+            <a href="{% url 'loginsignup:logout' %}" class="logout-btn">Logout</a>
+        </div>
+
+        <div class="dashboard">
+            <div class="card">
+                <h3>Crop Recommendation</h3>
+                <p>Get the best crop suggestions based on soil, climate, and season.</p>
+            </div>
+            <div class="card">
+                <h3>Fertilizer Guidance</h3>
+                <p>Optimize fertilizer usage for healthier crops.</p>
+            </div>
+            <div class="card">
+                <h3>Price Prediction</h3>
+                <p>Predict crop prices using historical data.</p>
+            </div>
+            <div class="card">
+                <h3>AgroBot Chat</h3>
+                <p>Interact with our multilingual AI chatbot.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    {% include 'services/footer.html' %}
+
+</body>
+
+</html>

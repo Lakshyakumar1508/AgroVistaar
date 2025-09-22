@@ -1,0 +1,354 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AgroVistaar - Home</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    /* Navbar */
+    #navbar {
+      background-color: #0c776e;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 5%;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      font-size: 1.5em;
+      font-weight: bold;
+    }
+
+    .logo-img {
+      width: 40px;
+      height: 40px;
+      margin-right: 10px;
+      object-fit: contain;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 25px;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .nav-links a {
+      color: white;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 1.05em;
+      transition: color 0.3s ease;
+    }
+
+    .nav-links a:hover {
+      color: #e25822;
+    }
+
+    .lang-icons {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-left: 15px;
+    }
+
+    .lang-icons img {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      object-fit: cover;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+
+    .lang-icons img:hover {
+      transform: scale(1.1);
+    }
+
+    /* Hero Section */
+    #hero {
+      width: 100%;
+      aspect-ratio: 12/7;
+      background: url("{% static 'services/home.jpg' %}") no-repeat center/cover;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      text-align: center;
+      position: relative;
+      padding: 0 20px;
+    }
+
+    #hero::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.35);
+      z-index: 1;
+    }
+
+    #hero h1,
+    #hero p {
+      position: relative;
+      z-index: 2;
+    }
+
+    #hero h1 {
+      font-size: 3em;
+      margin-bottom: 20px;
+      text-shadow: 2px2px8px rgba(0, 0, 0, 0.7);
+    }
+
+    #hero p {
+      font-size: 1.3em;
+      max-width: 600px;
+      text-shadow: 1px1px5px rgba(0, 0, 0, 0.6);
+    }
+
+    /* Services Section */
+    #services {
+      padding: 60px 5%;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 30px;
+      background: #f9f9f9;
+    }
+
+    .service-card {
+      background: #fff;
+      padding: 25px;
+      border-radius: 10px;
+      text-align: center;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+      transition: 0.3s;
+    }
+
+    .service-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+    }
+
+    .service-card img {
+      width: 60px;
+      height: 60px;
+      margin-bottom: 15px;
+    }
+
+    .service-card h3 {
+      margin-bottom: 10px;
+      font-size: 1.4em;
+      color: #333;
+    }
+
+    .service-card p {
+      font-size: 1em;
+      color: #555;
+      line-height: 1.5;
+    }
+
+    /* Chatbot */
+    #chatbot-container {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      z-index: 998;
+    }
+
+    /* Scroll Top */
+    #scroll-top {
+      position: fixed;
+      bottom: 30px;
+      left: 30px;
+      width: 50px;
+      height: 50px;
+      background: #0c776e;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      font-size: 1.8em;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(20px);
+      transition: 0.3s;
+    }
+
+    #scroll-top.visible {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    #scroll-top:hover {
+      background-color: #e25822;
+      transform: scale(1.1);
+    }
+  </style>
+</head>
+
+<body>
+
+
+
+
+  <!-- Navbar -->
+<nav id="navbar">
+  <div class="logo">
+    <img src="{% static 'services/logo.png' %}" alt="Logo" class="logo-img">
+    AgroVistaar
+  </div>
+  <ul class="nav-links">
+    <li><a id="nav-home" href="{% url 'home' %}">Home</a></li>
+    <li><a id="nav-services" href="{% url 'services' %}">Services</a></li>
+    <li><a id="nav-about" href="{% url 'about' %}">About</a></li>
+    <li><a id="nav-soil" href="{% url 'soilInfo' %}">SoilInfo</a></li>
+
+    {% if user.is_authenticated %}
+      <li><a href="{% url 'profile' %}">{{ user.username }}</a></li>
+    {% else %}
+      <li><a id="auth-link" href="{% url 'loginsignup:login' %}">Sign In</a></li>
+    {% endif %}
+
+    <li class="lang-icons">
+      <img src="{% static 'services/A.png' %}" alt="English" title="English" onclick="setLang('en')">
+      <img src="{% static 'services/Hnd.png' %}" alt="Hindi" title="Hindi" onclick="setLang('hi')">
+    </li>
+  </ul>
+</nav>
+
+
+
+
+
+
+  <!-- Hero Section -->
+  <section id="hero">
+    <h1 id="hero-title">Welcome to AgroVistaar</h1>
+    <p id="hero-desc">Your one-stop platform for crop recommendation, fertilizer guidance, price prediction, and
+      multilingual agricultural chatbot support.</p>
+  </section>
+
+
+
+
+  <!-- Services Section -->
+  <section id="services">
+    <div class="service-card">
+      <img src="{% static 'services/crop.png' %}" alt="Crop Recommendation">
+      <h3 id="service1-title">Crop Recommendation</h3>
+      <p id="service1-desc">Get the best crop suggestions based on soil, climate, and season for maximum yield.</p>
+    </div>
+    <div class="service-card">
+      <img src="{% static 'services/fertilizer.png' %}" alt="Fertilizer Recommendation">
+      <h3 id="service2-title">Fertilizer Recommendation</h3>
+      <p id="service2-desc">Optimize fertilizer usage for healthier crops and cost efficiency.</p>
+    </div>
+    <div class="service-card">
+      <img src="{% static 'services/chatbot.png' %}" alt="Chatbot">
+      <h3 id="service3-title">Multilingual Chatbot</h3>
+      <p id="service3-desc">Interact with our AI-powered chatbot in multiple languages, including Hindi and English.</p>
+    </div>
+    <div class="service-card">
+      <img src="{% static 'services/price.png' %}" alt="Price Prediction">
+      <h3 id="service4-title">Price Prediction</h3>
+      <p id="service4-desc">Predict crop prices using historical data and make better decisions for your harvest.</p>
+    </div>
+  </section>
+
+  <!-- Chatbot -->
+  <div id="chatbot-container">
+    {% include 'chatbot/index.html' %}
+  </div>
+
+  <!-- Footer -->
+  {% include 'services/footer.html' %}
+
+  <!-- Scroll Top Button -->
+  <button id="scroll-top">&#8679;</button>
+
+  <script>
+    // Scroll Top Button
+    const scrollBtn = document.getElementById('scroll-top');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 300) scrollBtn.classList.add('visible');
+      else scrollBtn.classList.remove('visible');
+    });
+    scrollBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+    // Translations
+    const translations = {
+      en: {
+        home: "Home", services: "Services", about: "About", soil: "Soil Info", auth: "Sign In",
+        heroTitle: "Welcome to AgroVistaar",
+        heroDesc: "Your one-stop platform for crop recommendation, fertilizer guidance, price prediction, and multilingual agricultural chatbot support.",
+        service1Title: "Crop Recommendation", service1Desc: "Get the best crop suggestions based on soil, climate, and season for maximum yield.",
+        service2Title: "Fertilizer Recommendation", service2Desc: "Optimize fertilizer usage for healthier crops and cost efficiency.",
+        service3Title: "Multilingual Chatbot", service3Desc: "Interact with our AI-powered chatbot in multiple languages, including Hindi and English.",
+        service4Title: "Price Prediction", service4Desc: "Predict crop prices using historical data and make better decisions for your harvest."
+      },
+      hi: {
+        home: "होम", services: "सेवाएँ", about: "हमारे बारे में", soil: "मिट्टी जानकारी", auth: "साइन इन",
+        heroTitle: "AgroVistaar में आपका स्वागत है",
+        heroDesc: "सबसे अच्छे फ़सल सुझाव, उर्वरक मार्गदर्शन, मूल्य पूर्वानुमान और बहुभाषी कृषि चैटबोट का अनुभव करें।",
+        service1Title: "फसल सिफारिश", service1Desc: "मिट्टी, जलवायु और मौसम के अनुसार सर्वोत्तम फसल सुझाव प्राप्त करें।",
+        service2Title: "उर्वरक सिफारिश", service2Desc: "स्वस्थ फसलों और लागत दक्षता के लिए उर्वरक का उपयोग अनुकूलित करें।",
+        service3Title: "बहुभाषी चैटबोट", service3Desc: "हमारे AI-चालित चैटबोट के साथ हिंदी और अंग्रेजी सहित कई भाषाओं में संवाद करें।",
+        service4Title: "मूल्य पूर्वानुमान", service4Desc: "ऐतिहासिक डेटा का उपयोग करके फसल की कीमतों का अनुमान लगाएँ और बेहतर निर्णय लें।"
+      }
+    };
+
+    function setLang(lang) {
+      const navHome = document.getElementById("nav-home");
+      const navServices = document.getElementById("nav-services");
+      const navAbout = document.getElementById("nav-about");
+      const authBtn = document.getElementById("auth-link");
+
+      if (navHome) navHome.innerText = translations[lang].home;
+      if (navServices) navServices.innerText = translations[lang].services;
+      if (navAbout) navAbout.innerText = translations[lang].about;
+      if (authBtn) authBtn.innerText = translations[lang].auth;
+
+      const heroTitle = document.getElementById("hero-title");
+      const heroDesc = document.getElementById("hero-desc");
+      if (heroTitle) heroTitle.innerText = translations[lang].heroTitle;
+      if (heroDesc) heroDesc.innerText = translations[lang].heroDesc;
+
+      for (let i = 1; i <= 4; i++) {
+        const sTitle = document.getElementById(`service${i}-title`);
+        const sDesc = document.getElementById(`service${i}-desc`);
+        if (sTitle) sTitle.innerText = translations[lang][`service${i}Title`];
+        if (sDesc) sDesc.innerText = translations[lang][`service${i}Desc`];
+      }
+    }
+
+    // Default Language
+    setLang('en');
+  </script>
+
+</body>
+
+</html>

@@ -1,0 +1,134 @@
+{% load static %}
+
+<nav id="navbar">
+    <div class="logo">
+        <img src="{% static 'services/logo.png' %}" alt="Logo" class="logo-img">
+        AgroVistaar
+    </div>
+
+    <ul class="nav-links">
+        <li><a id="nav-home" href="#">Home</a></li>
+        <li><a id="nav-services" href="#">Services</a></li>
+        <li><a id="nav-about" href="#">About</a></li>
+
+        {% if user.is_authenticated %}
+            <li><a href="#">{{ user.username }}</a></li>
+        {% else %}
+            <li><a id="auth-link" href="#">Sign In</a></li>
+        {% endif %}
+
+        <li class="lang-icons">
+            <img src="{% static 'services/A.png' %}" alt="English" title="English" onclick="setLang('en')">
+            <img src="{% static 'services/Hnd.png' %}" alt="Hindi" title="Hindi" onclick="setLang('hi')">
+        </li>
+    </ul>
+</nav>
+
+<style>
+    /* Navbar container */
+    #navbar {
+        background-color: #0c776e;
+        color: white;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 5%;
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        font-family: Arial, sans-serif;
+    }
+
+    /* Logo section */
+    .logo {
+        display: flex;
+        align-items: center;
+        font-size: 1.5em;
+        font-weight: bold;
+    }
+
+    .logo-img {
+        width: 40px;
+        height: 40px;
+        margin-right: 10px;
+        object-fit: contain;
+    }
+
+    /* Nav links */
+    .nav-links {
+        display: flex;
+        align-items: center;
+        gap: 25px;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    .nav-links a {
+        color: white;
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 1.05em;
+        transition: color 0.3s ease;
+    }
+
+    .nav-links a:hover {
+        color: #e25822;
+    }
+
+    /* Language icons */
+    .lang-icons {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        margin-left: 15px;
+    }
+
+    .lang-icons img {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        object-fit: cover;
+        cursor: pointer;
+        transition: transform 0.2s ease;
+    }
+
+    .lang-icons img:hover {
+        transform: scale(1.1);
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        #navbar {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+        }
+        .nav-links {
+            flex-direction: column;
+            gap: 10px;
+        }
+        .lang-icons {
+            margin-left: 0;
+        }
+    }
+</style>
+
+<script>
+    const translations = {
+        en: { home: "Home", services: "Services", about: "About", auth: "Sign In" },
+        hi: { home: "होम", services: "सेवाएँ", about: "हमारे बारे में", auth: "साइन इन" }
+    };
+
+    function setLang(lang) {
+        document.getElementById("nav-home").innerText = translations[lang].home;
+        document.getElementById("nav-services").innerText = translations[lang].services;
+        document.getElementById("nav-about").innerText = translations[lang].about;
+
+        const authBtn = document.getElementById("auth-link");
+        if (authBtn) {
+            authBtn.innerText = translations[lang].auth;
+        }
+    }
+</script>
