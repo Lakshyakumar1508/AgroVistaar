@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AgroVistaar Fertilizer Guide</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<h1>AgroVistaar Fertilizer Guide</h1>
+<input type="text" id="searchInput" placeholder="Search for fertilizer or crop...">
+
+
+<div id="fertilizerContainer" class="flex-container">
+    
+    <div class="card element-n">
+        <h2>Urea (N)</h2>
+        <p><strong>Crops:</strong> Cereals (Wheat, Rice)</p>
+        <p><strong>Method:</strong> Soil / Foliar</p>
+        <p><strong>Dose:</strong> 50-100 kg/ha</p>
+        <p><strong>Water:</strong> 20-30 L</p>
+    </div>
+    <div class="card element-np">
+        <h2>DAP (N+P)</h2>
+        <p><strong>Crops:</strong> Maize, Rice, Pulses</p>
+        <p><strong>Method:</strong> Soil</p>
+        <p><strong>Dose:</strong> 60–80 kg/ha</p>
+        <p><strong>Water:</strong> 15–25 L</p>
+    </div>
+    <div class="card element-k">
+        <h2>MOP (K)</h2>
+        <p><strong>Crops:</strong> Banana, Sugarcane</p>
+        <p><strong>Method:</strong> Soil</p>
+        <p><strong>Dose:</strong> 30–60 kg/ha</p>
+        <p><strong>Water:</strong> 20–25 L</p>
+    </div>
+    <div class="card element-ns">
+        <h2>Ammonium Sulfate (N+S)</h2>
+        <p><strong>Crops:</strong> Wheat, Oilseeds</p>
+        <p><strong>Method:</strong> Soil</p>
+        <p><strong>Dose:</strong> 40–60 kg/ha</p>
+        <p><strong>Water:</strong> 20–30 L</p>
+    </div>
+    <div class="card element-p">
+        <h2>Single Super Phosphate (P)</h2>
+        <p><strong>Crops:</strong> Groundnut, Cotton</p>
+        <p><strong>Method:</strong> Soil</p>
+        <p><strong>Dose:</strong> 50–70 kg/ha</p>
+        <p><strong>Water:</strong> 15–20 L</p>
+    </div>
+    <div class="card element-k">
+        <h2>Potash (K)</h2>
+        <p><strong>Crops:</strong> Potato, Tomato</p>
+        <p><strong>Method:</strong> Soil</p>
+        <p><strong>Dose:</strong> 40–60 kg/ha</p>
+        <p><strong>Water:</strong> 20–30 L</p>
+    </div>
+    <div class="card element-zn">
+        <h2>Zinc Sulfate (Micronutrient)</h2>
+        <p><strong>Crops:</strong> Rice, Maize</p>
+        <p><strong>Method:</strong> Soil / Foliar</p>
+        <p><strong>Dose:</strong> 25–50 kg/ha</p>
+        <p><strong>Water:</strong> 10–15 L</p>
+    </div>
+    <div class="card element-b">
+        <h2>Borax (Boron)</h2>
+        <p><strong>Crops:</strong> Sugarcane, Pulses</p>
+        <p><strong>Method:</strong> Foliar</p>
+        <p><strong>Dose:</strong> 2–3 kg/ha</p>
+        <p><strong>Water:</strong> 10–15 L</p>
+    </div>
+    <div class="card element-ca">
+        <h2>Gypsum (CaSO4)</h2>
+        <p><strong>Crops:</strong> Cotton, Sugarcane</p>
+        <p><strong>Method:</strong> Soil</p>
+        <p><strong>Dose:</strong> 100–200 kg/ha</p>
+        <p><strong>Water:</strong> 20–30 L</p>
+    </div>
+
+    <div class="card element-mg">
+        <h2>Magnesium Sulfate (MgSO4)</h2>
+        <p><strong>Crops:</strong> Tomato, Banana</p>
+        <p><strong>Method:</strong> Soil / Foliar</p>
+        <p><strong>Dose:</strong> 20–50 kg/ha</p>
+        <p><strong>Water:</strong> 15–20 L</p>
+    </div>
+
+    <div class="card element-fe">
+        <h2>Iron Sulfate (FeSO4)</h2>
+        <p><strong>Crops:</strong> Citrus, Rice</p>
+        <p><strong>Method:</strong> Soil / Foliar</p>
+        <p><strong>Dose:</strong> 25–50 kg/ha</p>
+        <p><strong>Water:</strong> 10–15 L</p>
+    </div>
+
+    <div class="card element-cu">
+        <h2>Copper Sulfate (CuSO4)</h2>
+        <p><strong>Crops:</strong> Tea, Banana</p>
+        <p><strong>Method:</strong> Soil / Foliar</p>
+        <p><strong>Dose:</strong> 5–10 kg/ha</p>
+        <p><strong>Water:</strong> 10–15 L</p>
+    </div>
+
+    <div class="card element-mn">
+        <h2>Manganese Sulfate (MnSO4)</h2>
+        <p><strong>Crops:</strong> Rice, Wheat</p>
+        <p><strong>Method:</strong> Soil / Foliar</p>
+        <p><strong>Dose:</strong> 20–40 kg/ha</p>
+        <p><strong>Water:</strong> 10–15 L</p>
+    </div>
+
+    <div class="card element-np">
+        <h2>Ammonium Phosphate (N+P)</h2>
+        <p><strong>Crops:</strong> Wheat, Maize</p>
+        <p><strong>Method:</strong> Soil</p>
+        <p><strong>Dose:</strong> 60–80 kg/ha</p>
+        <p><strong>Water:</strong> 15–25 L</p>
+    </div>
+
+    <div class="card element-organic">
+        <h2>Compost / Organic Manure</h2>
+        <p><strong>Crops:</strong> Vegetables, Fruits</p>
+        <p><strong>Method:</strong> Soil</p>
+        <p><strong>Dose:</strong> 5–10 tons/ha</p>
+        <p><strong>Water:</strong> As needed</p>
+    </div>
+
+    <div class="card element-organic">
+        <h2>Vermicompost</h2>
+        <p><strong>Crops:</strong> All Crops</p>
+        <p><strong>Method:</strong> Soil</p>
+        <p><strong>Dose:</strong> 2–5 tons/ha</p>
+        <p><strong>Water:</strong> As needed</p>
+    </div>
+
+    <div class="card element-organic">
+        <h2>Neem Cake</h2>
+        <p><strong>Crops:</strong> Pulses, Oilseeds</p>
+        <p><strong>Method:</strong> Soil</p>
+        <p><strong>Dose:</strong> 500–1000 kg/ha</p>
+        <p><strong>Water:</strong> 15–20 L</p>
+    </div>
+
+    <div class="card element-can">
+        <h2>Calcium Nitrate (Ca(NO3)2)</h2>
+        <p><strong>Crops:</strong> Vegetables, Fruits, Flowers</p>
+        <p><strong>Method:</strong> Soil / Foliar</p>
+        <p><strong>Dose:</strong> 15–30 kg/ha</p>
+        <p><strong>Water:</strong> 10–20 L</p>
+    </div>
+
+    <div class="card element-kn">
+        <h2>Potassium Nitrate (KNO3)</h2>
+        <p><strong>Crops:</strong> Fruits, Vegetables, Tobacco</p>
+        <p><strong>Method:</strong> Soil / Foliar</p>
+        <p><strong>Dose:</strong> 10–25 kg/ha</p>
+        <p><strong>Water:</strong> 10–15 L</p>
+    </div>
+
+    <div class="card element-p">
+        <h2>Triple Super Phosphate (TSP)</h2>
+        <p><strong>Crops:</strong> Legumes, Root Crops</p>
+        <p><strong>Method:</strong> Soil</p>
+        <p><strong>Dose:</strong> 40–70 kg/ha</p>
+        <p><strong>Water:</strong> 15–25 L</p>
+    </div>
+
+    <div class="card element-mn">
+        <h2>Manganese Chelate (Mn-EDTA)</h2>
+        <p><strong>Crops:</strong> Soybeans, Wheat, Oats</p>
+        <p><strong>Method:</strong> Foliar</p>
+        <p><strong>Dose:</strong> 1–2 kg/ha</p>
+        <p><strong>Water:</strong> 5–10 L</p>
+    </div>
+
+    <div class="card element-organic">
+        <h2>Humic Acid</h2>
+        <p><strong>Crops:</strong> All Crops (Soil Conditioner)</p>
+        <p><strong>Method:</strong> Soil / Drench</p>
+        <p><strong>Dose:</strong> 5–10 L/ha (liquid) or 5–15 kg/ha (granular)</p>
+        <p><strong>Water:</strong> As needed</p>
+    </div>
+
+    <div class="card element-organic">
+        <h2>Seaweed Extract</h2>
+        <p><strong>Crops:</strong> All Crops (Bio-stimulant)</p>
+        <p><strong>Method:</strong> Foliar / Soil</p>
+        <p><strong>Dose:</strong> 1–3 L/ha</p>
+        <p><strong>Water:</strong> 5–10 L</p>
+    </div>
+
+    <div class="card element-s">
+        <h2>Sulphur (S)</h2>
+        <p><strong>Crops:</strong> Oilseeds, Pulses, Onion, Garlic</p>
+        <p><strong>Method:</strong> Soil</p>
+        <p><strong>Dose:</strong> 20–40 kg/ha</p>
+        <p><strong>Water:</strong> 20–30 L</p>
+    </div>
+
+    <div class="card element-bio">
+        <h2>Bio-fertilizers (e.g., Rhizobium)</h2>
+        <p><strong>Crops:</strong> Legumes (e.g., Soybeans, Peanuts)</p>
+        <p><strong>Method:</strong> Seed Treatment / Soil</p>
+        <p><strong>Dose:</strong> As per product instructions</p>
+        <p><strong>Water:</strong> As needed</p>
+    </div>
+
+    <div class="card element-k">
+        <h2>Potassium Sulfate (K2SO4)</h2>
+        <p><strong>Crops:</strong> Tobacco, Fruits, Chlorine-sensitive crops</p>
+        <p><strong>Method:</strong> Soil / Foliar</p>
+        <p><strong>Dose:</strong> 20–50 kg/ha</p>
+        <p><strong>Water:</strong> 15–25 L</p>
+    </div>
+
+    <div class="card element-zn">
+        <h2>Chelated Zinc (Zn-EDTA)</h2>
+        <p><strong>Crops:</strong> Citrus, Corn, Beans</p>
+        <p><strong>Method:</strong> Foliar</p>
+        <p><strong>Dose:</strong> 0.5–2 kg/ha</p>
+        <p><strong>Water:</strong> 5–10 L</p>
+    </div>
+
+    <div class="card element-can">
+        <h2>Calcium Ammonium Nitrate (CAN)</h2>
+        <p><strong>Crops:</strong> Cereals, Vegetables</p>
+        <p><strong>Method:</strong> Soil / Foliar</p>
+        <p><strong>Dose:</strong> 50–100 kg/ha</p>
+        <p><strong>Water:</strong> 20–30 L</p>
+    </div>
+
+    <div class="card element-pk">
+        <h2>Mono Potassium Phosphate (MKP)</h2>
+        <p><strong>Crops:</strong> Fruits, Grapes, Tomatoes</p>
+        <p><strong>Method:</strong> Foliar / Fertigation</p>
+        <p><strong>Dose:</strong> 5–10 kg/ha</p>
+        <p><strong>Water:</strong> 10–20 L</p>
+    </div>
+
+    <div class="card element-fe">
+        <h2>Chelated Iron (Fe-EDTA)</h2>
+        <p><strong>Crops:</strong> Citrus, Soybeans, Ornamentals</p>
+        <p><strong>Method:</strong> Foliar</p>
+        <p><strong>Dose:</strong> 1–3 kg/ha</p>
+        <p><strong>Water:</strong> 5–10 L</p>
+    </div>
+
+    <div class="card element-organic">
+        <h2>Bone Meal (Organic P)</h2>
+        <p><strong>Crops:</strong> Root Vegetables, Flowers</p>
+        <p><strong>Method:</strong> Soil</p>
+        <p><strong>Dose:</strong> 200–500 kg/ha</p>
+        <p><strong>Water:</strong> As needed</p>
+    </div>
+
+    <div class="card element-bio">
+        <h2>Mycorrhizal Inoculants</h2>
+        <p><strong>Crops:</strong> All Crops (Root Enhancer)</p>
+        <p><strong>Method:</strong> Seed Treatment / Soil</p>
+        <p><strong>Dose:</strong> As per product instructions</p>
+        <p><strong>Water:</strong> As needed</p>
+    </div>
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
