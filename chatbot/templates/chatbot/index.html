@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AgroBot</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+.chatbot { position: fixed; bottom: 20px; right: 20px; z-index: 1000; }
+.chatbot-toggle { background: #4caf50; color: white; border: none; border-radius: 50%; width: 60px; height: 60px; font-size: 24px; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+.chat-window { width: 320px; height: 450px; background: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); display: none; flex-direction: column; overflow: hidden; }
+.chat-header { background: #388e3c; color: white; padding: 12px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
+.chat-header button { background: none; border: none; color: white; font-size: 14px; cursor: pointer; margin-left: 5px; }
+.chat-messages { flex: 1; padding: 10px; overflow-y: auto; display: flex; flex-direction: column; background-color: #fafafa; }
+.chat-message { margin: 5px 0; padding: 8px 12px; border-radius: 18px; max-width: 80%; word-wrap: break-word; }
+.chat-message.user { background: #e1ffc7; align-self: flex-end; border-bottom-right-radius: 4px; }
+.chat-message.bot { background: #f1f1f1; align-self: flex-start; border-bottom-left-radius: 4px; cursor: pointer; }
+.chat-message.bot.loading { color: #555; }
+.chat-input { display: flex; border-top: 1px solid #ddd; padding: 5px; }
+.chat-input input { flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 20px; outline: none; margin-right: 5px; }
+.chat-input button { color: white; border: none; border-radius: 50%; width: 40px; height: 40px; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; }
+#send-btn { background: #4caf50; }
+.mic-btn { background: #ff9800; }
+.mic-btn.listening { background: #d32f2f; }
+</style>
+</head>
+<body>
+
+<div class="chatbot">
+    <button class="chatbot-toggle" id="chatbot-toggle">💬</button>
+    <div class="chat-window" id="chat-window">
+        <div class="chat-header">
+            <span>AgroBot</span>
+            <div>
+                <button id="lang-toggle">EN</button>
+                <button id="close-btn">✖</button>
+            </div>
+        </div>
+        <div class="chat-messages" id="chat-messages"></div>
+        <div class="chat-input">
+            <input type="text" id="chat-input-field" placeholder="Ask about farming...">
+            <button class="mic-btn" id="mic-btn">🎤</button>
+            <button id="send-btn">➤</button>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const chatbotToggle = document.getElementById("chatbot-toggle");
+    const chatWindow = document.getElementById("chat-window");
+    const closeBtn = document.getElementById("close-btn");
+    const chatMessages = document.getElementById("chat-messages");
+    const inputField = document.getElementById("chat-input-field");
+    const sendBtn = document.getElementById("send-btn");
+    const micBtn = document.getElementById("mic-btn");
+    const langToggle = document.getElementById("lang-toggle");
+
+    let messages = [
+        { sender: "bot", reply_hi: "👋 नमस्ते! मैं AgroBot हूँ।", reply_en: "👋 Hi! I’m AgroBot." }
+    ];
+    let currentLang = "en";
+
+    // --- Tap-to-speak TTS ---
+    const speak = (text) => {
+        if (!text) return;
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = /[\u0900-\u097F]/.test(text) ? 'hi-IN' : 'en-US';
+        utterance.rate = 1;
+        utterance.pitch = 1;
+        window.speechSynthesis.speak(utterance);
+    };
+
+    const renderMessages = () => {
+        chatMessages.innerHTML = "";
+        messages.forEach(msg => {
+            const msgDiv = document.createElement("div");
+            msgDiv.className = `chat-message ${msg.sender}`;
+            if(msg.sender === "bot") {
+                msgDiv.textContent = currentLang === "hi" ? msg.reply_hi || msg.text : msg.reply_en || msg.text;
+                msgDiv.addEventListener("click", () => speak(msgDiv.textContent));
+            } else {
+                msgDiv.textContent = msg.text;
+            }
+            chatMessages.appendChild(msgDiv);
+        });
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    };
+
+    const showLoading = () => {
+        const loadingDiv = document.createElement("div");
+        loadingDiv.className = "chat-message bot loading";
+        loadingDiv.id = "loading-indicator";
+        loadingDiv.textContent = "⏳ Thinking...";
+        chatMessages.appendChild(loadingDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    };
+
+    const removeLoading = () => {
+        const loading = document.getElementById("loading-indicator");
+        if (loading) loading.remove();
+    };
+
+    const fetchLocation = () => new Promise(resolve => {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                pos => resolve({ lat: pos.coords.latitude, lon: pos.coords.longitude }),
+                err => resolve(null)
+            );
+        } else resolve(null);
+    });
+
+    const sendMessage = async (customInput) => {
+        const textToSend = customInput || inputField.value.trim();
+        if (!textToSend) return;
+        messages.push({ sender: "user", text: textToSend });
+        renderMessages();
+        inputField.value = "";
+        showLoading();
+
+        const currentCoords = await fetchLocation();
+
+        try {
+            const res = await fetch("/chatbot/api/", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ message: textToSend, coords: currentCoords })
+            });
+            const data = await res.json();
+            messages.push({ sender: "bot", reply_hi: data.reply_hi, reply_en: data.reply_en });
+        } catch (err) {
+            console.error(err);
+            messages.push({ sender: "bot", reply_hi: "⚠️ सर्वर से कनेक्ट नहीं कर पाया।", reply_en: "⚠️ Could not connect to server." });
+        } finally {
+            removeLoading();
+            renderMessages();
+        }
+    };
+
+    const startListening = () => {
+        if (!("webkitSpeechRecognition" in window)) { alert("❌ Speech recognition not supported."); return; }
+        const recognition = new webkitSpeechRecognition();
+        recognition.lang = "en-IN";
+        recognition.interimResults = false;
+        recognition.maxAlternatives = 1;
+        micBtn.classList.add("listening");
+        recognition.start();
+        recognition.onresult = e => { const t = e.results[0][0].transcript; inputField.value = t; sendMessage(t); };
+        recognition.onerror = e => console.error(e.error);
+        recognition.onend = () => micBtn.classList.remove("listening");
+    };
+
+    chatbotToggle.addEventListener("click", () => { chatWindow.style.display = "flex"; chatbotToggle.style.display = "none"; });
+    closeBtn.addEventListener("click", () => { chatWindow.style.display = "none"; chatbotToggle.style.display = "block"; });
+    sendBtn.addEventListener("click", () => sendMessage());
+    inputField.addEventListener("keydown", e => e.key === "Enter" && sendMessage());
+    micBtn.addEventListener("click", startListening);
+    langToggle.addEventListener("click", () => {
+        currentLang = currentLang === "en" ? "hi" : "en";
+        langToggle.textContent = currentLang.toUpperCase();
+        renderMessages();
+    });
+
+    renderMessages();
+});
+</script>
+
+</body>
+</html>
