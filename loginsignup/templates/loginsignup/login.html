@@ -1,0 +1,127 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - AgroVistaar</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; background: #f1f8e9; }
+
+        /* Navbar */
+        #navbar {
+            background-color: #0c776e;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 5%;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+        .logo { display: flex; align-items: center; font-size: 1.5em; font-weight: bold; }
+        .logo-img { width: 40px; height: 40px; margin-right: 10px; object-fit: contain; }
+        .nav-links { display: flex; align-items: center; gap: 25px; list-style: none; margin: 0; padding: 0; }
+        .nav-links a { color: white; text-decoration: none; font-weight: 500; font-size: 1.05em; transition: color 0.3s ease; }
+        .nav-links a:hover { color: #e25822; }
+        .lang-icons { display: flex; gap: 10px; align-items: center; margin-left: 15px; }
+        .lang-icons img { width: 28px; height: 28px; border-radius: 50%; cursor: pointer; transition: transform 0.2s ease; }
+        .lang-icons img:hover { transform: scale(1.1); }
+
+        /* Login box */
+        .login-box {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            width: 320px;
+            text-align: center;
+            margin: 50px auto;
+        }
+        .login-box h2 { margin-bottom: 20px; color: #0c776e; }
+        .login-box input {
+            width: 100%; padding: 12px; margin: 8px 0;
+            border: 1px solid #ccc; border-radius: 6px;
+        }
+        .login-box button {
+            width: 100%; padding: 12px; background: #0c776e;
+            color: white; border: none; border-radius: 6px; font-size: 16px;
+            cursor: pointer; margin-top: 10px;
+        }
+        .login-box button:hover { background: #095a4f; }
+        .login-box p { margin-top: 15px; font-size: 14px; }
+        .login-box a { color: #0c776e; text-decoration: none; font-weight: bold; }
+        .login-box a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav id="navbar">
+    <div class="logo">
+        <img src="{% static 'services/logo.png' %}" alt="Logo" class="logo-img"> AgroVistaar
+    </div>
+    <ul class="nav-links">
+        <li><a id="nav-home" href="{% url 'home' %}">Home</a></li>
+        <li><a id="nav-services" href="{% url 'services' %}">Services</a></li>
+        <li><a id="nav-about" href="{% url 'about' %}">About</a></li>
+
+        {% if user.is_authenticated %}
+            <li><a href="{% url 'profile' %}">{{ user.username }}</a></li>
+        {% else %}
+            <li><a id="auth-link" href="{% url 'loginsignup:login' %}">Sign In</a></li>
+        {% endif %}
+
+        <li class="lang-icons">
+            <img src="{% static 'services/A.png' %}" alt="English" title="English" onclick="setLang('en')">
+            <img src="{% static 'services/Hnd.png' %}" alt="Hindi" title="Hindi" onclick="setLang('hi')">
+        </li>
+    </ul>
+</nav>
+
+<!-- Login Box -->
+<div class="login-box">
+    <h2 id="login-title">Login</h2>
+    <form method="post">
+        {% csrf_token %}
+        <input type="text" name="username" id="username" placeholder="Username" required>
+        <input type="password" name="password" id="password" placeholder="Password" required>
+        <button type="submit" id="login-btn">Sign In</button>
+    </form>
+    <p id="register-text">Don’t have an account? <a href="{% url 'loginsignup:register' %}">Register</a></p>
+</div>
+
+<!-- Footer -->
+{% include 'services/footer.html' %}
+
+<script>
+    // Multilingual translations
+    const translations = {
+        en: {
+            home:"Home", services:"Services", about:"About", auth:"Sign In",
+            loginTitle:"Login", loginBtn:"Sign In", registerText:"Don’t have an account? Register"
+        },
+        hi: {
+            home:"होम", services:"सेवाएँ", about:"हमारे बारे में", auth:"साइन इन",
+            loginTitle:"लॉगिन", loginBtn:"साइन इन", registerText:"खाता नहीं है? रजिस्टर करें"
+        }
+    };
+
+    function setLang(lang) {
+        document.getElementById("nav-home").innerText = translations[lang].home;
+        document.getElementById("nav-services").innerText = translations[lang].services;
+        document.getElementById("nav-about").innerText = translations[lang].about;
+        const authBtn = document.getElementById("auth-link");
+        if(authBtn) authBtn.innerText = translations[lang].auth;
+        document.getElementById("login-title").innerText = translations[lang].loginTitle;
+        document.getElementById("login-btn").innerText = translations[lang].loginBtn;
+        document.getElementById("register-text").innerHTML = translations[lang].registerText.replace("Register","<a href='{% url 'loginsignup:register' %}'>Register</a>");
+    }
+
+    // Set default language
+    setLang('en');
+</script>
+
+</body>
+</html>

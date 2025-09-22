@@ -1,0 +1,128 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Register - AgroVistaar</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; background: #f1f8e9; }
+
+        /* Navbar */
+        #navbar {
+            background-color: #0c776e;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 5%;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+        .logo { display: flex; align-items: center; font-size: 1.5em; font-weight: bold; }
+        .logo-img { width: 40px; height: 40px; margin-right: 10px; object-fit: contain; }
+        .nav-links { display: flex; align-items: center; gap: 25px; list-style: none; margin: 0; padding: 0; }
+        .nav-links a { color: white; text-decoration: none; font-weight: 500; font-size: 1.05em; transition: color 0.3s ease; }
+        .nav-links a:hover { color: #e25822; }
+        .lang-icons { display: flex; gap: 10px; align-items: center; margin-left: 15px; }
+        .lang-icons img { width: 28px; height: 28px; border-radius: 50%; cursor: pointer; transition: transform 0.2s ease; }
+        .lang-icons img:hover { transform: scale(1.1); }
+
+        /* Register box */
+        .register-box {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            width: 360px;
+            text-align: center;
+            margin: 50px auto;
+        }
+        .register-box h2 { margin-bottom: 20px; color: #0c776e; }
+        .register-box input {
+            width: 100%; padding: 12px; margin: 8px 0;
+            border: 1px solid #ccc; border-radius: 6px;
+        }
+        .register-box button {
+            width: 100%; padding: 12px; background: #0c776e;
+            color: white; border: none; border-radius: 6px; font-size: 16px;
+            cursor: pointer; margin-top: 10px;
+        }
+        .register-box button:hover { background: #095a4f; }
+        .register-box p { margin-top: 15px; font-size: 14px; }
+        .register-box a { color: #0c776e; text-decoration: none; font-weight: bold; }
+        .register-box a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav id="navbar">
+    <div class="logo">
+        <img src="{% static 'services/logo.png' %}" alt="Logo" class="logo-img"> AgroVistaar
+    </div>
+    <ul class="nav-links">
+        <li><a id="nav-home" href="{% url 'home' %}">Home</a></li>
+        <li><a id="nav-services" href="{% url 'services' %}">Services</a></li>
+        <li><a id="nav-about" href="{% url 'about' %}">About</a></li>
+
+        {% if user.is_authenticated %}
+            <li><a href="{% url 'profile' %}">{{ user.username }}</a></li>
+        {% else %}
+            <li><a id="auth-link" href="{% url 'loginsignup:login' %}">Sign In</a></li>
+        {% endif %}
+
+        <li class="lang-icons">
+            <img src="{% static 'services/A.png' %}" alt="English" title="English" onclick="setLang('en')">
+            <img src="{% static 'services/Hnd.png' %}" alt="Hindi" title="Hindi" onclick="setLang('hi')">
+        </li>
+    </ul>
+</nav>
+
+<!-- Register Box -->
+<div class="register-box">
+    <h2 id="register-title">Register</h2>
+    <form method="post">
+        {% csrf_token %}
+        <input type="text" name="username" placeholder="Username" required>
+        <input type="email" name="email" placeholder="Email" required>
+        <input type="password" name="password1" placeholder="Password" required>
+        <input type="password" name="password2" placeholder="Confirm Password" required>
+        <button type="submit" id="register-btn">Register</button>
+    </form>
+    <p id="login-text">Already have an account? <a href="{% url 'loginsignup:login' %}">Login</a></p>
+</div>
+
+<!-- Footer -->
+{% include 'services/footer.html' %}
+
+<script>
+    // Multilingual translations
+    const translations = {
+        en: {
+            home:"Home", services:"Services", about:"About", auth:"Sign In",
+            registerTitle:"Register", registerBtn:"Register", loginText:"Already have an account? Login"
+        },
+        hi: {
+            home:"होम", services:"सेवाएँ", about:"हमारे बारे में", auth:"साइन इन",
+            registerTitle:"रजिस्टर", registerBtn:"रजिस्टर", loginText:"पहले से खाता है? लॉगिन"
+        }
+    };
+
+    function setLang(lang) {
+        document.getElementById("nav-home").innerText = translations[lang].home;
+        document.getElementById("nav-services").innerText = translations[lang].services;
+        document.getElementById("nav-about").innerText = translations[lang].about;
+        const authBtn = document.getElementById("auth-link");
+        if(authBtn) authBtn.innerText = translations[lang].auth;
+        document.getElementById("register-title").innerText = translations[lang].registerTitle;
+        document.getElementById("register-btn").innerText = translations[lang].registerBtn;
+        document.getElementById("login-text").innerHTML = translations[lang].loginText.replace("Login","<a href='{% url 'loginsignup:login' %}'>Login</a>");
+    }
+
+    setLang('en'); // default
+</script>
+
+</body>
+</html>
