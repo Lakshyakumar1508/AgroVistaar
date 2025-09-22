@@ -1,0 +1,286 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>🌱 Crop & Fertilizer Recommendation Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: url("https://img.freepik.com/premium-photo/farmers-crop-rotation-scouting-checklist-background_987764-47144.jpg") no-repeat center center fixed;
+            background-size: cover;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 80px; /* space for sticky navbar */
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            width: 90%;
+            max-width: 1200px;
+            margin-bottom: 40px; /* space for footer */
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.92);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+        }
+
+        h2 {
+            color: #2e7d32;
+            margin-bottom: 15px;
+            font-size: 22px;
+        }
+
+        label {
+            font-weight: bold;
+            margin-top: 10px;
+            display: block;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            margin-bottom: 12px;
+        }
+
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: 0.3s;
+            width: 100%;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background: #388e3c;
+        }
+
+        .output-box {
+            margin-bottom: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            background: #f4f7f8;
+            border: 1px solid #ccc;
+        }
+
+        .output-box h3 {
+            color: #1b5e20;
+            margin-bottom: 8px;
+        }
+
+        .no-data {
+            color: #999;
+            font-style: italic;
+        }
+
+        /* Navbar */
+        #navbar {
+            background-color: #0c776e;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 5%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        .logo-img {
+            width: 40px;
+            height: 40px;
+            margin-right: 10px;
+            object-fit: contain;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 1.05em;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: #e25822;
+        }
+
+        .lang-icons {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .lang-icons img {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            object-fit: cover;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .lang-icons img:hover {
+            transform: scale(1.1);
+        }
+
+        /* Footer */
+        footer {
+            background-color: #0c776e;
+            color: white;
+            width: 100%;
+            padding: 15px 5%;
+            text-align: center;
+            font-size: 0.95em;
+            margin-top: auto;
+            box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-links {
+                gap: 15px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <nav id="navbar">
+        <div class="logo">
+            <!-- <img src="{% static 'myapp/logo.png' %}" alt="Logo" class="logo-img"> -->
+            AgroVistaar
+        </div>
+        <ul class="nav-links">
+            <li><a id="nav-home" href="{% url 'home' %}">Home</a></li>
+            <li><a id="nav-services" href="{% url 'services' %}">Services</a></li>
+            <li><a id="nav-about" href="{% url 'about' %}">About</a></li>
+            <li><a id="nav-soilInfo" href="{% url 'soilInfo' %}">SoilInfo</a></li>
+            {% if user.is_authenticated %}
+            <li><a href="{% url 'profile' %}">{{ user.username }}</a></li>
+            {% else %}
+            <li><a id="auth-link" href="{% url 'loginsignup:login' %}">Sign In</a></li>
+            {% endif %}
+            <li class="lang-icons">
+                <!-- <img src="{% static 'myapp/A.png' %}" alt="English" title="English" onclick="setLang('en')"> -->
+                <!-- <img src="{% static 'myapp/Hnd.png' %}" alt="Hindi" title="Hindi" onclick="setLang('hi')"> -->
+            </li>
+        </ul>
+    </nav>
+
+    <div class="dashboard">
+        <!-- Input Section -->
+        <div class="card">
+            <h2>Enter Soil & Weather Data</h2>
+            <form method="post">
+                {% csrf_token %}
+                <label for="N">Nitrogen (N)</label>
+                <input type="number" step="any" name="N" value="{{ submitted_inputs.N }}">
+
+                <label for="P">Phosphorus (P)</label>
+                <input type="number" step="any" name="P" value="{{ submitted_inputs.P }}">
+
+                <label for="K">Potassium (K)</label>
+                <input type="number" step="any" name="K" value="{{ submitted_inputs.K }}">
+
+                <label for="temperature">Temperature (°C)</label>
+                <input type="number" step="any" name="temperature" value="{{ submitted_inputs.temperature }}">
+
+                <label for="humidity">Humidity (%)</label>
+                <input type="number" step="any" name="humidity" value="{{ submitted_inputs.humidity }}">
+
+                <label for="ph">pH Value</label>
+                <input type="number" step="any" name="ph" value="{{ submitted_inputs.ph }}">
+
+                <label for="rainfall">Rainfall (mm)</label>
+                <input type="number" step="any" name="rainfall" value="{{ submitted_inputs.rainfall }}">
+
+                <button type="submit">🌱 Predict</button>
+            </form>
+        </div>
+
+        <!-- Dashboard Output -->
+        <div class="card">
+            <h2>Dashboard Output</h2>
+
+            <!-- Submitted Input -->
+            <div class="output-box">
+                <h3>Submitted Input</h3>
+                {% if submitted_inputs.N %}
+                <p><strong>N:</strong> {{ submitted_inputs.N }}</p>
+                <p><strong>P:</strong> {{ submitted_inputs.P }}</p>
+                <p><strong>K:</strong> {{ submitted_inputs.K }}</p>
+                <p><strong>Temperature:</strong> {{ submitted_inputs.temperature }} °C</p>
+                <p><strong>Humidity:</strong> {{ submitted_inputs.humidity }} %</p>
+                <p><strong>pH:</strong> {{ submitted_inputs.ph }}</p>
+                <p><strong>Rainfall:</strong> {{ submitted_inputs.rainfall }} mm</p>
+                {% else %}
+                <p class="no-data">No input submitted yet.</p>
+                {% endif %}
+            </div>
+
+            <!-- Prediction -->
+            <div class="output-box">
+                <h3>Prediction & Fertilizer</h3>
+                {% if prediction %}
+                <p><strong>Recommended Crop:</strong> {{ prediction }}</p>
+                <p><strong>Suggested Fertilizer:</strong> {{ fertilizer }}</p>
+                {% else %}
+                <p class="no-data">No prediction available yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        &copy; {{ now|date:"Y" }} AgroVistaar. All Rights Reserved.
+    </footer>
+
+</body>
+
+</html>
