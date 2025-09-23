@@ -1,0 +1,219 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Crop Info - AgroVistaar</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background: #f0f0f0;
+    }
+
+    /* Navbar */
+    #navbar {
+      background-color: #0c776e;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 5%;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      font-size: 1.5em;
+      font-weight: bold;
+    }
+
+    .logo img {
+      width: 40px;
+      height: 40px;
+      margin-right: 10px;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .nav-links a {
+      color: white;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .nav-links a:hover { color: #e25822; }
+
+    /* Main Content */
+    .container {
+      max-width: 600px;
+      margin: 40px auto;
+      background: #fff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+    }
+
+    h1 { color: #0c776e; text-align: center; margin-bottom: 20px; }
+
+    input, button {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 1em;
+    }
+
+    button {
+      background-color: #0c776e;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover { background-color: #06594f; }
+
+    #output {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 8px;
+      background: #f9f9f9;
+      border: 1px solid #ddd;
+      min-height: 100px;
+      white-space: pre-wrap;
+    }
+
+    /* TTS Buttons */
+    .tts-buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .tts-buttons button {
+      flex: 1;
+      background-color: #28a745;
+    }
+
+    .tts-buttons button:hover { background-color: #218838; }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav id="navbar">
+    <div class="logo">
+      <img src="{% static 'services/logo.png' %}" alt="Logo">
+      AgroVistaar
+    </div>
+    <ul class="nav-links">
+      <li><a href="{% url 'home' %}">Home</a></li>
+      <li><a href="{% url 'services' %}">Services</a></li>
+      <li><a href="{% url 'about' %}">About</a></li>
+      <li><a href="{% url 'soilInfo' %}">Soil Info</a></li>
+      {% if user.is_authenticated %}
+      <li><a href="{% url 'profile' %}">{{ user.username }}</a></li>
+      {% else %}
+      <li><a href="{% url 'loginsignup:login' %}">Sign In</a></li>
+      {% endif %}
+    </ul>
+  </nav>
+
+  <!-- Crop Info Form -->
+  <div class="container">
+    <h1>Crop Info</h1>
+    <input type="text" id="cropName" placeholder="Enter crop name (e.g., wheat)">
+    <input type="text" id="location" placeholder="Enter location (e.g., Roorkee)">
+    <button onclick="getCropInfo()">Get Info</button>
+
+    <div class="tts-buttons">
+      <button onclick="speakText()">🔊 Tap to Speak</button>
+      <button onclick="stopSpeech()">⏹ Stop</button>
+    </div>
+
+    <div id="output"></div>
+  </div>
+
+  <script>
+    // CSRF token for Django POST
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let cookie of cookies) {
+                cookie = cookie.trim();
+                if (cookie.startsWith(name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    const csrftoken = getCookie('csrftoken');
+
+    // Fetch crop info
+    async function getCropInfo() {
+      const cropName = document.getElementById('cropName').value.trim();
+      const location = document.getElementById('location').value.trim();
+      const output = document.getElementById('output');
+
+      if (!cropName) {
+        output.textContent = "⚠️ Please enter a crop name.";
+        return;
+      }
+
+      try {
+        const res = await fetch("{% url 'crops:crop_info' %}", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": csrftoken
+          },
+          body: JSON.stringify({
+            message: `Crop: ${cropName}, Location: ${location}`,
+            coords: null
+          })
+        });
+        const data = await res.json();
+        if (data.reply_en) output.textContent = data.reply_en;
+        else if (data.error) output.textContent = data.error;
+      } catch (err) {
+        output.textContent = "⚠️ Request failed. Check console.";
+        console.error(err);
+      }
+    }
+
+    // TTS
+    let speech = null;
+    function speakText() {
+      const text = document.getElementById('output').textContent;
+      if (!text) return;
+      stopSpeech();
+      speech = new SpeechSynthesisUtterance(text);
+      speech.lang = 'en-US';
+      window.speechSynthesis.speak(speech);
+    }
+    function stopSpeech() {
+      if (speech) {
+        window.speechSynthesis.cancel();
+        speech = null;
+      }
+    }
+  </script>
+</body>
+</html>
