@@ -1,0 +1,237 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgriSim AI - What If Simulator</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@700;900&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <style>
+        body { font-family: 'Roboto', sans-serif; background-color: #f8fafc; }
+        h1,h2,h3 { font-family: 'Merriweather', serif; }
+
+        /* Navbar */
+        #navbar {
+            background-color: #0c776e;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 5%;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+        .logo { display: flex; align-items: center; font-size: 1.5em; font-weight: bold; }
+        .logo-img { width: 40px; height: 40px; margin-right: 10px; object-fit: contain; }
+        .nav-links { display: flex; align-items: center; gap: 25px; list-style: none; margin: 0; padding: 0; }
+        .nav-links a { color: white; text-decoration: none; font-weight: 500; font-size: 1.05em; transition: color 0.3s ease; }
+        .nav-links a:hover { color: #e25822; }
+        .lang-icons { display: flex; gap: 10px; align-items: center; margin-left: 15px; }
+        .lang-icons img { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; cursor: pointer; transition: transform 0.2s ease; }
+        .lang-icons img:hover { transform: scale(1.1); }
+
+        /* Simulator */
+        .loader {
+            border: 4px solid #e5e7eb;
+            border-radius: 50%;
+            border-top: 4px solid #2563eb;
+            width: 40px; height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 2rem auto;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .ai-response h3 {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: #1e40af;
+            margin-top: 1.25rem;
+            margin-bottom: 0.5rem;
+            padding-bottom: 0.25rem;
+            border-bottom: 2px solid #dbeafe;
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <!-- Navbar -->
+    <nav id="navbar">
+        <div class="logo">
+            <img src="{% static 'services/logo.png' %}" alt="Logo" class="logo-img">
+            AgroVistaar
+        </div>
+        <ul class="nav-links">
+            <li><a id="nav-home" href="{% url 'home' %}">Home</a></li>
+            <li><a id="nav-services" href="{% url 'services' %}">Services</a></li>
+            <li><a id="nav-about" href="{% url 'about' %}">About</a></li>
+            <li><a id="nav-soilInfo" href="{% url 'soilInfo' %}">SoilInfo</a></li>
+            {% if user.is_authenticated %}
+                <li><a href="{% url 'profile' %}">{{ user.username }}</a></li>
+            {% else %}
+                <li><a id="auth-link" href="{% url 'loginsignup:login' %}">Sign In</a></li>
+            {% endif %}
+            <li class="lang-icons">
+                <img src="{% static 'services/A.png' %}" alt="English" title="English" onclick="setLang('en')">
+                <img src="{% static 'services/Hnd.png' %}" alt="Hindi" title="Hindi" onclick="setLang('hi')">
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="py-10 px-6 max-w-5xl mx-auto">
+
+        <!-- AI Simulator -->
+        <section id="simulator" class="py-10">
+            <div id="chat-container" class="bg-white rounded-2xl shadow-xl overflow-hidden">
+                <header class="bg-blue-700 text-white p-5 text-center">
+                    <h2 class="text-2xl font-bold">कृषि "क्या होगा अगर" AI सिम्युलेटर</h2>
+                    <p class="text-sm opacity-90">Agri "What If" AI Simulator Room</p>
+                </header>
+
+                <main id="response-area" class="p-6 h-96 overflow-y-auto">
+                    <div id="welcome-message" class="text-center text-gray-500 p-8">
+                        <h3 class="text-xl font-semibold mb-2">Welcome to the Simulator!</h3>
+                        <p>Ask a "what if" question about Indian agriculture to begin.</p>
+                        <p class="mt-4 text-sm"><strong>Example:</strong> "What if I grow rice instead of maize?"</p>
+                    </div>
+                </main>
+
+                <footer class="p-4 bg-gray-100 border-t">
+                    <form id="what-if-form" class="flex items-center space-x-3">
+                        {% csrf_token %}
+                        <input type="text" id="user-input" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none transition" placeholder="Enter your 'What if...' scenario" autocomplete="off">
+                        <button type="submit" id="submit-btn" class="bg-blue-600 text-white font-semibold px-6 py-3 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+                            Ask
+                        </button>
+                    </form>
+                </footer>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-6 mt-10">
+        <div class="container mx-auto text-center">
+            <p>&copy; 2025 AgroVistaar. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Language Translation
+        const translations = {
+            en: { home: "Home", services: "Services", about: "About", soilInfo: "Soil Info", auth: "Sign In" },
+            hi: { home: "होम", services: "सेवाएँ", about: "हमारे बारे में", soilInfo: "मिट्टी जानकारी", auth: "साइन इन" }
+        };
+        function setLang(lang){
+            document.getElementById("nav-home").innerText = translations[lang].home;
+            document.getElementById("nav-services").innerText = translations[lang].services;
+            document.getElementById("nav-about").innerText = translations[lang].about;
+            document.getElementById("nav-soilInfo").innerText = translations[lang].soilInfo;
+            const authBtn = document.getElementById("auth-link");
+            if(authBtn) authBtn.innerText = translations[lang].auth;
+        }
+
+        // Simulator JS
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('what-if-form');
+            const userInput = document.getElementById('user-input');
+            const responseArea = document.getElementById('response-area');
+            const welcomeMessage = document.getElementById('welcome-message');
+            const submitBtn = document.getElementById('submit-btn');
+            const csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]')?.value;
+            let userCoords = null;
+
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(pos => { userCoords = { lat: pos.coords.latitude, lon: pos.coords.longitude }; });
+            }
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const query = userInput.value.trim();
+                if (!query) return;
+
+                if (welcomeMessage) welcomeMessage.style.display = 'none';
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = 'Simulating...';
+
+                const loader = document.createElement('div');
+                loader.className = 'loader';
+                loader.id = 'loading-spinner';
+                responseArea.appendChild(loader);
+                responseArea.scrollTop = responseArea.scrollHeight;
+
+                try {
+                    const headers = { 'Content-Type':'application/json' };
+                    if(csrfToken) headers['X-CSRFToken']=csrfToken;
+
+                    const response = await fetch(window.location.href, {
+                        method:'POST',
+                        headers: headers,
+                        body: JSON.stringify({ message: query, coords: userCoords })
+                    });
+                    const data = await response.json();
+                    displayResponse(data.reply_en, query);
+                } catch(err) {
+                    displayResponse("<h3>Error</h3><p>Could not get a simulation result.</p>", "Error");
+                } finally {
+                    userInput.value='';
+                    submitBtn.disabled=false;
+                    submitBtn.innerHTML='Ask';
+                    document.getElementById('loading-spinner')?.remove();
+                    userInput.focus();
+                }
+            });
+
+            function displayResponse(responseText, userQuery){
+                const container = document.createElement('div');
+                container.className='mb-6';
+
+                const queryBubble=document.createElement('div');
+                queryBubble.className='bg-gray-200 p-3 rounded-lg ml-auto max-w-xl text-right mb-2';
+                queryBubble.innerHTML=`<p class="font-semibold">Your Scenario:</p><p>${userQuery}</p>`;
+
+                const responseCard=document.createElement('div');
+                responseCard.className='ai-response bg-blue-50 p-4 rounded-lg border border-blue-200';
+                responseCard.innerHTML=responseText.replace(/<[^>]*>?/gm,'').replace(/\n/g,'<br>');
+
+                // Tap-to-Speak Button
+                const speakBtn=document.createElement('button');
+                speakBtn.innerText='🔊 Speak';
+                speakBtn.className='mt-2 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition';
+                let speaking=false;
+                let utterance=null;
+
+                speakBtn.addEventListener('click', ()=>{
+                    if(!speaking){
+                        utterance=new SpeechSynthesisUtterance(responseText.replace(/<[^>]*>?/gm,''));
+                        utterance.lang='en-IN';
+                        speechSynthesis.speak(utterance);
+                        speakBtn.innerText='⏹ Stop';
+                        speaking=true;
+                        utterance.onend=()=>{ speakBtn.innerText='🔊 Speak'; speaking=false; };
+                    }else{
+                        speechSynthesis.cancel();
+                        speakBtn.innerText='🔊 Speak';
+                        speaking=false;
+                    }
+                });
+
+                responseCard.appendChild(speakBtn);
+                container.appendChild(queryBubble);
+                container.appendChild(responseCard);
+                responseArea.appendChild(container);
+                responseArea.scrollTop=responseArea.scrollHeight;
+            }
+        });
+    </script>
+</body>
+</html>
